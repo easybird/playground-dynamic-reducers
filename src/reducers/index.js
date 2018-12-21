@@ -1,5 +1,5 @@
 import { createStore, combineReducers } from "redux";
-import dynamicDeviceReducer, { createDeviceReducer } from "./devices";
+import dynamicDeviceReducer, { createDeviceReducer } from "./device";
 import installer from "./installer";
 import actions from "./actions";
 
@@ -22,7 +22,6 @@ const initializeStore = () => {
 
   store.injectReducer = (key, reducer) => {
     store.asyncDeviceReducers[key] = reducer;
-    console.log("injectedReducer", store.asyncDeviceReducers[key]);
     // IMPORTANT here we inject the merged reducers into the existing store
     store.replaceReducer(rootReducers(store.asyncDeviceReducers));
   };
