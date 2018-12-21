@@ -1,5 +1,5 @@
 import { createStore, combineReducers } from "redux";
-import dynamicDeviceReducer, { deviceReducer } from "./devices";
+import dynamicDeviceReducer, { createDeviceReducer } from "./devices";
 import installer from "./installer";
 import actions from "./actions";
 
@@ -22,6 +22,7 @@ const initializeStore = () => {
 
   store.injectReducer = (key, reducer) => {
     store.asyncDeviceReducers[key] = reducer;
+    console.log("injectedReducer", store.asyncDeviceReducers[key]);
     // IMPORTANT here we inject the merged reducers into the existing store
     store.replaceReducer(rootReducers(store.asyncDeviceReducers));
   };
@@ -36,10 +37,10 @@ const initializeStore = () => {
 
 const theOneAndOnlyStore = initializeStore();
 
-export const addDeviceReducer = deviceId => {
+export const addDeviceReducer = (deviceId, deviceName) => {
   console.log("addReducer", deviceId);
   theOneAndOnlyStore.injectReducer(deviceId, (state, action) =>
-    deviceReducer(
+    createDeviceReducer(deviceId, deviceName)(
       state,
       // IMPORTANT this makes sure not all device get updated, only the impacted reducer receives the action
       action.payload && action.payload.deviceId === deviceId
@@ -50,8 +51,8 @@ export const addDeviceReducer = deviceId => {
 };
 
 export const removeDeviceReducers = () => {
-  Object.keys(theOneAndOnlyStore.getState().devices.deviceList).forEach(
-    deviceId => theOneAndOnlyStore.removeReducer(deviceId)
+  Object.keys(theOneAndOnlyStore.getState().devices).forEach(deviceId =>
+    theOneAndOnlyStore.removeReducer(deviceId)
   );
 };
 

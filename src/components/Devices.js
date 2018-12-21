@@ -17,7 +17,9 @@ const Devices = ({ deviceList = [] }) => (
 );
 
 const mapStateToProps = ({ devices }) => ({
-  deviceList: Object.values(devices.deviceList)
+  deviceList: Object.values(devices)
+    .map(device => device && device.deviceData)
+    .filter(Boolean)
 });
 
 export default connect(
