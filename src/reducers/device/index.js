@@ -1,23 +1,29 @@
 import powerStateReducer from "./powerState";
 import temperatureReducer from "./temperature";
-import createDeviceDataReducer from "./deviceData";
+import deviceDataReducer from "./deviceData";
 import { combineReducers } from "redux";
 
-const emptyReducer = () => ({});
+const device = combineReducers({
+  deviceData: deviceDataReducer,
+  powerState: powerStateReducer,
+  temperature: temperatureReducer
+});
 
-// IMPORTANT the device reducers combines all dynamically injected reducers
-const dynamicDeviceReducer = (asyncDeviceReducers = {}) =>
-  Object.keys(asyncDeviceReducers).length > 0
-    ? combineReducers({
-        ...asyncDeviceReducers
-      })
-    : emptyReducer;
+const devices = (state = {}, action) => {
+  switch (action.type) {
+    case "REMOVE_DEVICES":
+      return {};
+    default:
+      break;
+  }
 
-export const createDeviceReducer = (id, name) =>
-  combineReducers({
-    deviceData: createDeviceDataReducer(id, name),
-    powerState: powerStateReducer,
-    temperature: temperatureReducer
-  });
+  if (!action.payload || !action.payload.deviceId) {
+    return state;
+  }
+  return {
+    ...state,
+    [action.payload.deviceId]: device(state[action.payload.deviceId], action)
+  };
+};
 
-export default dynamicDeviceReducer;
+export default devices;
